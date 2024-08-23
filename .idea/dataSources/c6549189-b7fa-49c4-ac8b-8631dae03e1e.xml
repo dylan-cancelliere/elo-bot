@@ -499,7 +499,7 @@
     </routine>
     <schema id="191" parent="1" name="main">
       <Current>1</Current>
-      <LastIntrospectionLocalTimestamp>2024-08-23.00:58:14</LastIntrospectionLocalTimestamp>
+      <LastIntrospectionLocalTimestamp>2024-08-23.17:02:35</LastIntrospectionLocalTimestamp>
     </schema>
     <argument id="192" parent="16">
       <ArgumentDirection>R</ArgumentDirection>
@@ -1602,7 +1602,7 @@
     <column id="562" parent="555" name="game_id">
       <NotNull>1</NotNull>
       <Position>1</Position>
-      <StoredType>integer|0s</StoredType>
+      <StoredType>text|0s</StoredType>
     </column>
     <column id="563" parent="555" name="civ_name">
       <NotNull>1</NotNull>
@@ -1617,7 +1617,7 @@
     <column id="565" parent="556" name="game_id">
       <NotNull>1</NotNull>
       <Position>1</Position>
-      <StoredType>integer|0s</StoredType>
+      <StoredType>text|0s</StoredType>
     </column>
     <column id="566" parent="556" name="civ_name">
       <NotNull>1</NotNull>
@@ -1632,7 +1632,7 @@
     <column id="568" parent="557" name="game_id">
       <NotNull>1</NotNull>
       <Position>1</Position>
-      <StoredType>integer|0s</StoredType>
+      <StoredType>text|0s</StoredType>
     </column>
     <column id="569" parent="557" name="player_name">
       <NotNull>1</NotNull>
@@ -1644,9 +1644,8 @@
       <StoredType>integer|0s</StoredType>
     </column>
     <column id="571" parent="558" name="game_id">
-      <NotNull>1</NotNull>
       <Position>1</Position>
-      <StoredType>integer|0s</StoredType>
+      <StoredType>text|0s</StoredType>
     </column>
     <column id="572" parent="558" name="player_name">
       <NotNull>1</NotNull>
@@ -1658,66 +1657,70 @@
       <Position>3</Position>
       <StoredType>integer|0s</StoredType>
     </column>
-    <column id="574" parent="559" name="id">
-      <NotNull>1</NotNull>
-      <Position>1</Position>
+    <column id="574" parent="558" name="placement">
+      <Position>4</Position>
       <StoredType>integer|0s</StoredType>
     </column>
-    <column id="575" parent="559" name="start_time">
+    <column id="575" parent="559" name="id">
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>text|0s</StoredType>
+    </column>
+    <column id="576" parent="559" name="start_time">
       <Position>2</Position>
       <StoredType>integer|0s</StoredType>
     </column>
-    <column id="576" parent="559" name="end_time">
+    <column id="577" parent="559" name="end_time">
       <Position>3</Position>
       <StoredType>integer|0s</StoredType>
     </column>
-    <column id="577" parent="559" name="map">
+    <column id="578" parent="559" name="map">
       <Position>4</Position>
       <StoredType>TEXT|0s</StoredType>
     </column>
-    <column id="578" parent="559" name="bbg">
+    <column id="579" parent="559" name="bbg">
       <NotNull>1</NotNull>
       <Position>5</Position>
       <StoredType>integer|0s</StoredType>
     </column>
-    <column id="579" parent="560" name="name">
+    <column id="580" parent="560" name="name">
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StoredType>TEXT|0s</StoredType>
     </column>
-    <column id="580" parent="560" name="ffa_rating">
+    <column id="581" parent="560" name="ffa_rating">
       <Position>2</Position>
       <StoredType>REAL|0s</StoredType>
     </column>
-    <column id="581" parent="560" name="teamers_rating">
+    <column id="582" parent="560" name="teamers_rating">
       <Position>3</Position>
       <StoredType>REAL|0s</StoredType>
     </column>
-    <column id="582" parent="560" name="ffa_sigma">
+    <column id="583" parent="560" name="ffa_sigma">
       <Position>4</Position>
       <StoredType>REAL|0s</StoredType>
     </column>
-    <column id="583" parent="560" name="teamers_sigma">
+    <column id="584" parent="560" name="teamers_sigma">
       <Position>5</Position>
       <StoredType>REAL|0s</StoredType>
     </column>
-    <column id="584" parent="561" name="type">
+    <column id="585" parent="561" name="type">
       <Position>1</Position>
       <StoredType>TEXT|0s</StoredType>
     </column>
-    <column id="585" parent="561" name="name">
+    <column id="586" parent="561" name="name">
       <Position>2</Position>
       <StoredType>TEXT|0s</StoredType>
     </column>
-    <column id="586" parent="561" name="tbl_name">
+    <column id="587" parent="561" name="tbl_name">
       <Position>3</Position>
       <StoredType>TEXT|0s</StoredType>
     </column>
-    <column id="587" parent="561" name="rootpage">
+    <column id="588" parent="561" name="rootpage">
       <Position>4</Position>
       <StoredType>INT|0s</StoredType>
     </column>
-    <column id="588" parent="561" name="sql">
+    <column id="589" parent="561" name="sql">
       <Position>5</Position>
       <StoredType>TEXT|0s</StoredType>
     </column>
