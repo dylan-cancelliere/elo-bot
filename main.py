@@ -91,6 +91,19 @@ async def get_player(name: str):
         return None
     return {"name": result[0][0], "ffa_rating": int(result[0][1] * RATING_MULT), "teamers_rating": int(result[0][2] * RATING_MULT),}
 
+@app.get("/players/{players}")
+async def get_players(players: str):
+    if players == "": return {}
+    player_list = players.split(",")
+    fetched_list = []
+    for player in player_list:
+        print(player)
+        res = cursor.execute(get_player_query(player)).fetchall()
+        print("Test",res)
+
+        fetched_list.append([player, None, None]) if len(res) == 0 else fetched_list.append(res[0])
+    return {"players": list(map(lambda x: {"name": x[0], "ffa_rating": None if x[1] is None else int(x[1] * RATING_MULT), "teamers_rating": None if x[2] is None else int(x[2] * RATING_MULT)} , fetched_list))}
+
 @app.post("/game")
 async def create_game(game: Game) -> list[PlayerChange]:
     # Generate game
@@ -140,7 +153,7 @@ async def create_game(game: Game) -> list[PlayerChange]:
             return model.create_rating(name=player_name, rating=[p[2], p[3]])
 
         plackett_order = list(map(lambda team: list(map(lambda p: get_player_plackett(p), team)), game.teams))
-        updated_plackett = model.rate(plackett_order)
+        updated_plackett = model.rate(deepcopy(plackett_order))
         counter = 0
         for t in updated_plackett:
             # Keeps track of placement
@@ -173,10 +186,10 @@ async def create_game(game: Game) -> list[PlayerChange]:
 
 @app.get("/test")
 async def test():
-    game = Game(players=[PlayerRecord(player_name="Dylan", civ_name="congo", placement=2, bans=["america", "egypt"]),
+    game = Game(players=[PlayerRecord(player_name="test123", civ_name="congo", placement=2, bans=["america", "egypt"]),
                          PlayerRecord(player_name="Dyllon", civ_name="greece", placement=1, bans=["china", "canada"]),],
                 # teams=[["Dylan"], ["Dyllon"]],
-                bans=[BanRecord("Dylan", ["america", "egypt"]), BanRecord("Dyllon", ["china", "canada"])],
+                bans=[BanRecord("test123", ["america", "egypt"]), BanRecord("Dyllon", ["china", "canada"])],
                 start_time=int(time.time()),
                 end_time=int(time.time() + 3600 * 6),
                 map="pangea",
