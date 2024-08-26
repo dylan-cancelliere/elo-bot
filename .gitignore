@@ -3,5 +3,4 @@
 .venv
 .idea
 __pycache__
-start_bot.bat
-start_server.bat
+start.bat
