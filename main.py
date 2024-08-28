@@ -19,7 +19,7 @@ class PlayerRecord(NamedTuple):
     player_name: str
     civ_name: str
     placement: int
-    bans: list[str] | None
+    bans: list[str]
 
 class PlayerPlacement(NamedTuple):
     player_name: str
@@ -30,15 +30,14 @@ class PlayerPlacement(NamedTuple):
 class BanRecord(NamedTuple):
     player_name: str
     # List of civ names
-    bans: list[str] | None
+    bans: list[str]
 
 class Game(NamedTuple):
+    date: str
     players: list[PlayerRecord]
     # list of teams, each team is a list of player names
     teams: list[list[str]] | None = None
-    bans: list[BanRecord] | None = None
-    start_time: int | None = None
-    end_time: int | None = None
+    bans: list[BanRecord] = []
     map: str | None = None
     bbg: bool = False
 
@@ -108,9 +107,9 @@ async def get_players(players: str):
 async def create_game(game: Game) -> list[PlayerChange]:
     # Generate game
     game_id = uuid4()
-    cursor.execute("""insert into games (id, start_time, end_time, map, bbg)
-       values ('{}', {}, {}, '{}', {})""".format(
-        game_id, game.start_time, game.end_time, game.map, game.bbg
+    cursor.execute("""insert into games (id, date map, bbg)
+       values ('{}', {}, {}, '{}')""".format(
+        game_id, game.date, game.map, game.bbg
     ))
 
     is_teamer_game = game.teams is not None
@@ -190,8 +189,7 @@ async def test():
                          PlayerRecord(player_name="Dyllon", civ_name="greece", placement=1, bans=["china", "canada"]),],
                 # teams=[["Dylan"], ["Dyllon"]],
                 bans=[BanRecord("test123", ["america", "egypt"]), BanRecord("Dyllon", ["china", "canada"])],
-                start_time=int(time.time()),
-                end_time=int(time.time() + 3600 * 6),
+                date="08-28-2024",
                 map="pangea",
                 bbg=True
                 )

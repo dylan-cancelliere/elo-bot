@@ -1,22 +1,9 @@
 import discord
 import os
 import requests
+from constants import *
+from datetime import datetime
 from dotenv import load_dotenv
-
-### Constants
-API_BASE_URL = "http://localhost:8000"
-
-COMMAND_PREFIX = "$civ-bot"
-COMMAND_INFO = "info"
-
-INVALID_COMMAND = "Error: invalid command"
-HELP_COMMAND ="""
-Available commands:\n
-`$civ-bot info @username`: displays stats for player a given player\n
-`$civ-bot lobby`: displays rating info for all users in your vc\n
-`$civ-bot create`: logs your game. TBD
-"""
-###
 
 load_dotenv()
 
@@ -40,7 +27,14 @@ async def handleCommand(message, channel):
             await handleGetInfo(tokens[2], channel)
         case "lobby":
             await handleGetLobby(message)
+        case "list":
+            await channel.send("Civ names:\n{}".format(" ".join(list(map(lambda x: "`{}`".format(x), CIV_LIST)))))
+        case "create":
+            print(message.content)
         case _:
+            if tokens[1].startswith("create"):
+                await handleCreateGame(message)
+                return
             await channel.send(INVALID_COMMAND + "\n\n" + HELP_COMMAND)
 
 async def handleGetInfo(player: str, channel):
@@ -67,6 +61,91 @@ async def handleGetLobby(message):
 ```""".format("\n".join(formatted_players))
         )
     print("USER QUERY", users_query)
+
+async def handleCreateGame(message):
+    content = message.content.split("\n")
+    index = 1
+
+    # Game params
+    # map is reserved
+    mp = ""
+    bbg = False
+    league = None
+    lobby_bans = []
+    players = []
+
+    while content[index] != "" and index < len(content):
+        line = content[index].split(": ")
+        if len(line) < 2:
+            return None
+        cmd = line[0].lower()
+        ops = line[1].strip()
+        match cmd:
+            case "map":
+                mp = ops
+            case "league":
+                league = ops
+            case "bbg":
+                bbg = ops.lower() in ['yes', 'true', 't', 'y', '1']
+            case "lobby_bans":
+                lobby_bans = ops.split(" ")
+                lobby_bans = list(filter(lambda x: x in CIV_LIST, lobby_bans))
+                if len(lobby_bans) < len(ops.split(" ")): await message.channel.send("Game logger: Skipping some unknown civs in lobby bans (warning)")
+            case _:
+                await message.channel.send("Game logger: Skipping unknown option '{}' (warning)".format(cmd))
+        index += 1
+
+    while content[index] == "" and index < len(content):
+        index += 1
+
+    while content[index] != "" and index < len(content):
+        player_line = content[index].strip().split(" ")
+        position = player_line[0]
+        if '.' in position:
+            position = position[:-1]
+            if not position.isdigit():
+                await message.channel.send("Game logger: Error parsing player list: invalid placement '{}'".format(position))
+                return
+        # example format: 1. @killer_diller yongle bans peter
+        if len(player_line) < 3:
+            await message.channel.send("Game logger: Error parsing player list: expected min 2 player arguments, got {}".format(len(player_line-1)))
+            return
+        name = player_line[1]
+        civ = player_line[2].lower()
+        if civ not in CIV_LIST:
+            await message.channel.send("Game logger: Error parsing player list: unknown civ '{}'".format(civ))
+
+        bans = []
+        for x in range(3,len(player_line)):
+            ban = player_line[x].lower()
+            if ban == "bans": continue
+            if ban not in CIV_LIST:
+                await message.channel.send("Game logger: Skipping unknown civ ban '{}' (warning)".format(ban))
+            bans.append(ban)
+        players.append({"player_name": name, "civ_name": civ, "placement": int(position), "bans": bans})
+
+    teams = None
+    if players[1]["placement"] == 1:
+        teams = []
+        counter = 1
+        for player in players:
+            if player["placement"] == counter:
+                teams[counter-1].append(player["player_name"])
+            else:
+                teams.append([player["player_name"]])
+
+    body = {
+        "date": datetime.today().strftime('%d-%m-%Y'),
+        "players": players,
+        "teams": teams,
+        "bans": list(map(lambda x: dict(player_name=x["player_name"], bans=x["bans"]), players)),
+        "map": mp,
+        "bbg": bbg
+    }
+
+    res = requests.post("{}/game".format(API_BASE_URL), json=body).json()
+    print(res)
+
 
 def printUserRating(name, ffa, teamers):
     return "{}:\n\tFFA:\t\t{}\n\tTeamers:\t{}".format(name, ffa, teamers)
