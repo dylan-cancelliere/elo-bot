@@ -32,7 +32,7 @@ class BanRecord(NamedTuple):
     # List of civ names
     bans: list[str]
 
-class Game(NamedTuple):
+class Game(BaseModel):
     date: str
     players: list[PlayerRecord]
     # list of teams, each team is a list of player names

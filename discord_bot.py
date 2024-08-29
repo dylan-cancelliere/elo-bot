@@ -74,7 +74,7 @@ async def handleCreateGame(message):
     lobby_bans = []
     players = []
 
-    while content[index] != "" and index < len(content):
+    while index < len(content) and content[index] != "":
         line = content[index].split(": ")
         if len(line) < 2:
             return None
@@ -95,11 +95,13 @@ async def handleCreateGame(message):
                 await message.channel.send("Game logger: Skipping unknown option '{}' (warning)".format(cmd))
         index += 1
 
-    while content[index] == "" and index < len(content):
+    while index < len(content) and content[index] == "":
         index += 1
 
-    while content[index] != "" and index < len(content):
+    while index < len(content) and content[index] != "":
         player_line = content[index].strip().split(" ")
+        player_line = list(filter(lambda y: y != "", player_line))
+        print("PLAYER LINE:", player_line)
         position = player_line[0]
         if '.' in position:
             position = position[:-1]
@@ -108,7 +110,7 @@ async def handleCreateGame(message):
                 return
         # example format: 1. @killer_diller yongle bans peter
         if len(player_line) < 3:
-            await message.channel.send("Game logger: Error parsing player list: expected min 2 player arguments, got {}".format(len(player_line-1)))
+            await message.channel.send("Game logger: Error parsing player list: expected min 2 player arguments, got {}".format(len(player_line)-1))
             return
         name = player_line[1]
         civ = player_line[2].lower()
@@ -122,7 +124,10 @@ async def handleCreateGame(message):
             if ban not in CIV_LIST:
                 await message.channel.send("Game logger: Skipping unknown civ ban '{}' (warning)".format(ban))
             bans.append(ban)
+
+
         players.append({"player_name": name, "civ_name": civ, "placement": int(position), "bans": bans})
+        index += 1
 
     teams = None
     if players[1]["placement"] == 1:
@@ -135,12 +140,14 @@ async def handleCreateGame(message):
                 teams.append([player["player_name"]])
 
     body = {
-        "date": datetime.today().strftime('%d-%m-%Y'),
-        "players": players,
-        "teams": teams,
-        "bans": list(map(lambda x: dict(player_name=x["player_name"], bans=x["bans"]), players)),
-        "map": mp,
-        "bbg": bbg
+        "game": {
+            "date": datetime.today().strftime('%d-%m-%Y'),
+            "players": players,
+            "teams": teams,
+            "bans": list(map(lambda x: dict(player_name=x["player_name"], bans=x["bans"]), players)),
+            "map": mp,
+            "bbg": bbg
+        }
     }
 
     res = requests.post("{}/game".format(API_BASE_URL), json=body).json()
