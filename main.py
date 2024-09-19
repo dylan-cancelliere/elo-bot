@@ -89,7 +89,8 @@ async def get_player(name: str):
     result = cursor.execute(get_player_query(name)).fetchall()
     if len(result) == 0:
         return None
-    return {"name": result[0][0], "ffa_rating": int(result[0][1] * RATING_MULT), "teamers_rating": int(result[0][2] * RATING_MULT),}
+    return {"name": result[0][0], "ffa_rating":  None if result[0][1] is None else int(result[0][1] * RATING_MULT),
+            "teamers_rating": None if result[0][2] is None else int(result[0][2] * RATING_MULT)}
 
 @app.get("/players/{players}")
 async def get_players(players: str):

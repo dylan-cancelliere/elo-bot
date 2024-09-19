@@ -40,23 +40,17 @@ async def handleGetInfo(player: str, channel):
     if res is None:
         await channel.send("Error: no player \"{}\" found. Players must log at least one game to appear".format(player))
         return
-    await channel.send(
-"""```py
-{}```""".format(printUserRating(player, res["ffa_rating"], res["teamers_rating"]))
-    )
+    await channel.send(printUserRating(player, res["ffa_rating"], res["teamers_rating"]))
 
 async def handleGetLobby(message):
     if message.author.voice is None:
         await message.channel.send("Error: user is not connected to a voice channel")
         return
-    vc_members = ",".join(list(map(lambda x: x.name, client.get_channel(message.author.voice.channel.id).members)))
+    vc_members = ",".join(list(map(lambda x: "<@{}>".format(x.id), client.get_channel(message.author.voice.channel.id).members)))
     users_query = requests.get("{}/players/{}".format(API_BASE_URL, vc_members)).json()
     if users_query is not None and "players" in users_query and len(users_query["players"]) > 0:
         formatted_players = list(map(lambda x: printUserRating(x['name'], x['ffa_rating'], x['teamers_rating']), users_query["players"]))
-        await message.channel.send("""```py
-{}
-```""".format("\n".join(formatted_players))
-        )
+        await message.channel.send("\n".join(str(x) for x in formatted_players))
 
 async def handleCreateGame(message):
     content = message.content.split("\n")
@@ -154,7 +148,9 @@ async def handleCreateGame(message):
 
 
 def printUserRating(name, ffa, teamers):
-    return "{}:\n\tFFA:\t\t{}\n\tTeamers:\t{}".format(name, ffa, teamers)
+    return """
+    {}:\n```py
+FFA:\t\t{}\nTeamers:\t{}```""".format(name, ffa, teamers)
 
 @client.event
 async def on_ready():
