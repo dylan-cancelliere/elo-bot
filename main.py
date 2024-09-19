@@ -40,6 +40,7 @@ class Game(BaseModel):
     bans: list[BanRecord] = []
     map: str | None = None
     bbg: bool = False
+    league: str | None = None
 
 class PlayerChange(BaseModel):
     name: str
@@ -96,9 +97,7 @@ async def get_players(players: str):
     player_list = players.split(",")
     fetched_list = []
     for player in player_list:
-        print(player)
         res = cursor.execute(get_player_query(player)).fetchall()
-        print("Test",res)
 
         fetched_list.append([player, None, None]) if len(res) == 0 else fetched_list.append(res[0])
     return {"players": list(map(lambda x: {"name": x[0], "ffa_rating": None if x[1] is None else int(x[1] * RATING_MULT), "teamers_rating": None if x[2] is None else int(x[2] * RATING_MULT)} , fetched_list))}
@@ -108,8 +107,8 @@ async def create_game(game: Game) -> list[PlayerChange]:
     # Generate game
     game_id = uuid4()
 
-    cursor.execute("""insert into games (id, date, map, bbg) values ('{}', '{}', '{}', '{}')""".format(
-        game_id, game.date, game.map, game.bbg
+    cursor.execute("""insert into games (id, date, map, bbg, league) values ('{}', '{}', '{}', '{}', '{}')""".format(
+        game_id, game.date, game.map, game.bbg, game.league
     ))
 
     is_teamer_game = game.teams is not None

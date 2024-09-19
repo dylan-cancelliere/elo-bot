@@ -29,8 +29,6 @@ async def handleCommand(message, channel):
             await handleGetLobby(message)
         case "list":
             await channel.send("Civ names:\n{}".format(" ".join(list(map(lambda x: "`{}`".format(x), CIV_LIST)))))
-        case "create":
-            print(message.content)
         case _:
             if tokens[1].startswith("create"):
                 await handleCreateGame(message)
@@ -55,12 +53,10 @@ async def handleGetLobby(message):
     users_query = requests.get("{}/players/{}".format(API_BASE_URL, vc_members)).json()
     if users_query is not None and "players" in users_query and len(users_query["players"]) > 0:
         formatted_players = list(map(lambda x: printUserRating(x['name'], x['ffa_rating'], x['teamers_rating']), users_query["players"]))
-        print(formatted_players)
         await message.channel.send("""```py
 {}
 ```""".format("\n".join(formatted_players))
         )
-    print("USER QUERY", users_query)
 
 async def handleCreateGame(message):
     content = message.content.split("\n")
@@ -101,7 +97,6 @@ async def handleCreateGame(message):
     while index < len(content) and content[index] != "":
         player_line = content[index].strip().split(" ")
         player_line = list(filter(lambda y: y != "", player_line))
-        print("PLAYER LINE:", player_line)
         position = player_line[0]
         if '.' in position:
             position = position[:-1]
@@ -145,11 +140,17 @@ async def handleCreateGame(message):
         "teams": teams,
         "bans": list(map(lambda x: dict(player_name=x["player_name"], bans=x["bans"]), players)),
         "map": map_name,
-        "bbg": bbg
+        "bbg": bbg,
+        "league": league,
     }
 
     res = requests.post("{}/game".format(API_BASE_URL), json=body).json()
-    print(res)
+    if len(res) > 0:
+        res_str = ""
+        for player in res:
+            chng = player["elo_change"]
+            res_str += """1. {}: {} ({})\n""".format(player["name"], player["new_elo"], "+" + str(chng) if chng >= 0 else chng)
+        await message.channel.send("""Successfully logged game.\n\nUpdated ratings:\n{}""".format(res_str))
 
 
 def printUserRating(name, ffa, teamers):
