@@ -68,7 +68,7 @@ async def handleCreateGame(message):
 
     # Game params
     # map is reserved
-    mp = ""
+    map_name = ""
     bbg = False
     league = None
     lobby_bans = []
@@ -82,7 +82,7 @@ async def handleCreateGame(message):
         ops = line[1].strip()
         match cmd:
             case "map":
-                mp = ops
+                map_name = ops
             case "league":
                 league = ops
             case "bbg":
@@ -140,14 +140,12 @@ async def handleCreateGame(message):
                 teams.append([player["player_name"]])
 
     body = {
-        "game": {
-            "date": datetime.today().strftime('%d-%m-%Y'),
-            "players": players,
-            "teams": teams,
-            "bans": list(map(lambda x: dict(player_name=x["player_name"], bans=x["bans"]), players)),
-            "map": mp,
-            "bbg": bbg
-        }
+        "date": datetime.today().strftime('%d-%m-%Y'),
+        "players": players,
+        "teams": teams,
+        "bans": list(map(lambda x: dict(player_name=x["player_name"], bans=x["bans"]), players)),
+        "map": map_name,
+        "bbg": bbg
     }
 
     res = requests.post("{}/game".format(API_BASE_URL), json=body).json()

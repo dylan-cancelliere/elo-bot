@@ -107,8 +107,8 @@ async def get_players(players: str):
 async def create_game(game: Game) -> list[PlayerChange]:
     # Generate game
     game_id = uuid4()
-    cursor.execute("""insert into games (id, date map, bbg)
-       values ('{}', {}, {}, '{}')""".format(
+
+    cursor.execute("""insert into games (id, date, map, bbg) values ('{}', '{}', '{}', '{}')""".format(
         game_id, game.date, game.map, game.bbg
     ))
 
