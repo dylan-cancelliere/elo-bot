@@ -56,7 +56,7 @@ async def handleRandomCivs(message):
     bans = current
 
     # Filter any banned civs
-    civ_list = filter(lambda x: x not in bans , CIV_LIST)
+    civ_list = list(filter(lambda x: x not in bans , CIV_LIST))
     num_civs = len(civ_list) // len(players) if len(civ_list) // len(players) < MAX_RANDOM_CIVS else MAX_RANDOM_CIVS
     assignments = [x[:] for x in [[] * len(players)] * len(players)]
     # This feels like it could be a list comprehension but I'm too stupid for that
