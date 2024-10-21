@@ -43,16 +43,16 @@ async def handleCommand(message, channel):
 
 async def handleRandomCivs(message):
     # Parse user input
-    content = message.content.split(" ")[2:]
+    content = message.content.split(" ")[3:]
     players = []
     bans = []
     current = []
-    for x in range(3, len(content)):
+    for x in range(len(content)):
         if content[x].lower() == "bans":
             players = current
             current = []
             continue
-        current += content[x]
+        current.append(content[x])
     bans = current
 
     # Filter any banned civs
@@ -69,7 +69,7 @@ async def handleRandomCivs(message):
     for x in range(len(players)):
         msg += "**Player** {}:\n".format(players[x])
         for c in assignments[x]:
-            msg += "\t- {}\n".format(c)
+            msg += "  \- {}\n".format(c)
     await message.channel.send(msg)
 
 async def handleGetInfo(player: str, channel):
