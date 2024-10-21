@@ -10,7 +10,8 @@ Available commands:\n
 `$civ-bot info @username`: displays stats for player a given player\n
 `$civ-bot lobby`: displays rating info for all users in your vc\n
 `$civ-bot create`: logs your game. TBD\n
-`$civ-bot list`: lists all civ names recognized by the bot
+`$civ-bot list`: lists all civ names recognized by the bot\n
+`$civ-bot random-civs players @p1 @p2... bans civ1 civ2...`: Assigns each player up to six random civs to choose from, excluding banned civs
 """
 
 CIV_LIST = ["abraham-lincoln", "alexander", "amanitore", "ambiorix", "ba-trieu", "basil",
@@ -26,3 +27,5 @@ CIV_LIST = ["abraham-lincoln", "alexander", "amanitore", "ambiorix", "ba-trieu",
 "suleiman-muhtesem", "sundiata-keita", "tamar", "teddy-bull-moose", "teddy-rough-rider",
 "theodora", "tokugawa", "tomyris", "trajan", "victoria-empire", "victoria-steam",
 "wilfrid-laurier", "wilhelmina", "wu-zeitan", "yongle"]
+
+MAX_RANDOM_CIVS = 6

@@ -1,5 +1,6 @@
 import discord
 import os
+from random import randint
 import requests
 from constants import *
 from datetime import datetime
@@ -29,11 +30,47 @@ async def handleCommand(message, channel):
             await handleGetLobby(message)
         case "list":
             await channel.send("Civ names:\n{}".format(" ".join(list(map(lambda x: "`{}`".format(x), CIV_LIST)))))
+        case "random-civs":
+            if len(tokens) < 5:
+                await channel.send(INVALID_COMMAND)
+                return
+            await handleRandomCivs(message)
         case _:
             if tokens[1].startswith("create"):
                 await handleCreateGame(message)
                 return
             await channel.send(INVALID_COMMAND + "\n\n" + HELP_COMMAND)
+
+async def handleRandomCivs(message):
+    # Parse user input
+    content = message.content.split(" ")[2:]
+    players = []
+    bans = []
+    current = []
+    for x in range(3, len(content)):
+        if content[x].lower() == "bans":
+            players = current
+            current = []
+            continue
+        current += content[x]
+    bans = current
+
+    # Filter any banned civs
+    civ_list = filter(lambda x: x not in bans , CIV_LIST)
+    num_civs = len(civ_list) // len(players) if len(civ_list) // len(players) < MAX_RANDOM_CIVS else MAX_RANDOM_CIVS
+    assignments = [x[:] for x in [[] * len(players)] * len(players)]
+    # This feels like it could be a list comprehension but I'm too stupid for that
+    for _ in range(num_civs):
+        for j in range(len(players)):
+            assignments[j].append(civ_list.pop(randint(0, len(civ_list) - 1)))
+
+    # Format results and send to discord
+    msg = ""
+    for x in range(len(players)):
+        msg += "**Player** {}:\n".format(players[x])
+        for c in assignments[x]:
+            msg += "\t- {}\n".format(c)
+    await message.channel.send(msg)
 
 async def handleGetInfo(player: str, channel):
     res = requests.get("{}/player/{}".format(API_BASE_URL, player)).json()
